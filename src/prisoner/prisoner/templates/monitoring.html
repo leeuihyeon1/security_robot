@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>쇼생크 탈출 방지 관제탑</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.5em;
+            background-color: rgba(0, 0, 0, 0.7);
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #FF4136;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #E62E2E;
+        }
+        .container {
+            margin-top: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            min-height: calc(100vh - 150px);
+        }
+        .split-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+        .graphics-view {
+            width: 45%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+        .header-label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .status-display {
+            display: flex;
+            justify-content: space-around;
+            width: 300px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 6px;
+        }
+        .status-box {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            font-size: 1.2em;
+            padding: 10px 15px;
+        }
+        .indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .db-viewer-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .db-viewer-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+    <script>
+        // 이미지 새로고침 함수
+        function refreshImage(imageId, src) {
+            const img = document.getElementById(imageId);
+            img.src = src + '?t=' + new Date().getTime();
+        }
+
+        // 상태 색상 매핑
+        const colors = {
+            "보안구역 이상 없음": "green",
+            "탈옥자 발생 경찰 출동": "red",
+            "AMR 이동 중": "orange",
+            "AMR 현장 도착": "blue",
+            "객체 추적 대기 중": "gray",
+            "객체 인식 완료 추적 중": "yellow"
+        };
+
+        // 상태 업데이트 함수
+        function updateStatusBoxes(data) {
+            const statusDisplay = document.querySelector('.status-display');
+            const indicators = statusDisplay.querySelectorAll('.indicator');
+            const texts = statusDisplay.querySelectorAll('.status-text');
+
+            const statuses = Object.values(data);
+            statuses.forEach((status, idx) => {
+                if (indicators[idx]) {
+                    indicators[idx].style.backgroundColor = colors[status] || "gray";
+                    texts[idx].innerText = status;
+                }
+            });
+        }
+
+        // 상태 가져오기 함수
+        function fetchStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateStatusBoxes(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // 초기 실행
+        fetchStatus();
+        
+        // 주기적으로 상태 업데이트 및 이미지 새로고침
+        setInterval(() => {
+            fetchStatus();
+            refreshImage('cctv-image', '/video_commend');
+            refreshImage('amr-image', '/video_amr');
+        }, 1000);
+    </script>
+</head>
+<body>
+    <header>
+        <h1>쇼생크 탈출 방지 관제탑</h1>
+        <form action="{{ url_for('logout') }}" method="POST">
+            <button type="submit" class="logout-btn">로그아웃</button>
+        </form>
+    </header>
+    <div class="container">
+        <div class="split-container">
+            <div class="graphics-view">
+                <div class="header-label">CCTV</div>
+                <img id="cctv-image" src="/video_commend" alt="CCTV 영상">
+                <!-- 홈 버튼 추가 -->
+                <form action="{{ url_for('home_button') }}" method="POST">
+                    <button type="submit" class="button">Home</button>
+                </form>
+            </div>
+            <div class="graphics-view">
+                <div class="header-label">AMR</div>
+                <img id="amr-image" src="/video_amr" alt="AMR 영상">
+                <button class="button" onclick="alert('마취총을 발사합니다!')">Shoot</button>
+            </div>
+        </div>
+        <div class="status-display">
+            <div class="status-box">
+                <div class="indicator"></div>
+                <div class="status-text">Loading...</div>
+            </div>
+            <!-- 추가적인 상태 박스가 필요한 경우 여기에 추가 -->
+        </div>
+        <button class="db-viewer-btn" onclick="location.href='/db'">DB 뷰어</button>
+    </div>
+</body>
+</html>

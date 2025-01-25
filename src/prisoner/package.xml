@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>prisoner</name>
+  <version>0.0.0</version>
+  <description>Security camera and command center node</description>
+  <maintainer email="gksmfenddl3@naver.com">lee</maintainer>
+  <license>Apache License 2.0</license>
+
+  <!-- 빌드 의존성 -->
+  <buildtool_depend>ament_python</buildtool_depend>
+  <build_depend>rclpy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>interface</build_depend>
+  <build_depend>action_msgs</build_depend>
+  <build_depend>flask</build_depend>
+
+  <!-- 실행 의존성 -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>interface</exec_depend>
+  <exec_depend>action_msgs</exec_depend>
+  <exec_depend>flask</exec_depend>
+
+  <!-- 메시지 의존성 -->
+  <depend>rosidl_default_runtime</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>pytest</test_depend>
+
+  <depend>python3-simpleaudio</depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
